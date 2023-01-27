@@ -1,7 +1,7 @@
 ---
 - name: Copy app artifact
   copy:
-    src: "{{ src_artifact }}"
+    src: "{{ playbook_dir }}/files/{{ src_artifact }}"
     dest: "{{ app_home }}/{{ dest_artifact }}"
     owner: "{{ app_user }}"
     group: "{{ app_user }}"
