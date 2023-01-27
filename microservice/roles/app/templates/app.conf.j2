@@ -1,0 +1,2 @@
+JAVA_OPTS="{{ app_min_ram }} {{ app_max_ram }}"
+RUN_ARGS="--spring.profiles.active={{ app_active_profiles }} --logging.file.name={{ app_home }}/logs/{{ app_name }}.log --server.port={{ item.api_port }} --management.server.port={{ item.mgmt_port }}"

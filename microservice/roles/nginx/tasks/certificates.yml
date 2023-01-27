@@ -1,0 +1,54 @@
+---
+- name: Provided SSL Certificate
+  block:
+    - name: Copy SSL cert
+      copy:
+        content: "{{ ssl_cert }}"
+        dest: "{{ nginx_vhost_ssl_cert_path }}"
+      notify: reload nginx
+    - name: Copy SSL privkey
+      copy:
+        content: "{{ ssl_privkey }}"
+        dest: "{{ nginx_vhost_ssl_privkey_path }}"
+      notify: reload nginx
+  when: nginx_ssl_mode == 'provided'
+
+- name: Self-signed SSL Certificate
+  block:
+    - name: Create private key
+      openssl_privatekey:
+        path: "{{ nginx_vhost_ssl_privkey_path }}"
+        size: "{{ nginx_vhost_ssl_privkey_size }}"
+        type: "{{ nginx_vhost_ssl_privkey_type }}"
+        backup: yes
+      notify: reload nginx
+    - name: Generate Certificate Signing Request
+      openssl_csr:
+        path: "{{ nginx_vhost_ssl_csr_path }}"
+        privatekey_path: "{{ nginx_vhost_ssl_privkey_path }}"
+        email_address: "{{ nginx_certificate_email }}"
+        common_name: "{{ nginx_app_name }}"
+    - name: Generate a Self-Signed certificate
+      openssl_certificate:
+        path: "{{ nginx_vhost_ssl_cert_path }}"
+        privatekey_path: "{{ nginx_vhost_ssl_privkey_path }}"
+        csr_path: "{{ nginx_vhost_ssl_csr_path }}"
+        provider: selfsigned
+      notify: reload nginx
+  when: nginx_ssl_mode == 'selfsigned'
+
+- name: Let's encrypt certificate
+  block:
+    - name: Install certbot
+      include_role:
+        name: certbot
+    - name: Generate certificate
+      shell: "certbot --nginx -m {{ nginx_certificate_email }} --agree-tos -n --domains {{ nginx_server_name }}"
+      notify: reload nginx
+  when: nginx_ssl_mode == 'certbot'
+
+- name: The Diffie-Hellman parameter file is generated
+  openssl_dhparam:
+    path: "{{ nginx_vhost_ssl_dhparam_path }}"
+    size: "{{ nginx_vhost_ssl_dhparam_size }}"
+  notify: reload nginx

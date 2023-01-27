@@ -1,0 +1,16 @@
+app_user: app
+app_name: app
+app_home: /app
+app_artifact_name: app
+app_min_ram: '-Xms256m'
+app_max_ram: '-Xmx768m'
+
+app_instances:
+  - name: blue
+    api_port: 8081
+    mgmt_port: 8081
+  - name: green
+    api_port: 8082
+    mgmt_port: 8082
+
+app_service_envs: ''

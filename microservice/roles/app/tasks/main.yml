@@ -1,0 +1,76 @@
+---
+- name: Create app user
+  user:
+    name: "{{ app_user }}"
+    shell: /bin/bash
+
+- name: Create project deployment structure
+  file:
+    path: "{{ app_home }}"
+    state: directory
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: 0755
+
+- name: Create config file
+  template:
+    src: app.conf.j2
+    dest: "{{ app_home }}/{{ item.name }}.conf"
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+  with_items: "{{ app_instances }}"
+
+- name: Create check script
+  template:
+    src: check.sh.j2
+    dest: "{{ app_home }}/check-{{ item.name }}.sh"
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: a+x
+  with_items: "{{ app_instances }}"
+
+- name: Create service
+  template:
+    src: app.service.j2
+    dest: /etc/systemd/system/{{ app_name }}-{{ item.name }}.service
+  with_items: "{{ app_instances }}"
+  notify: reload services
+
+- name: Get current instance name
+  stat:
+    path: "{{ app_home }}/current-instance"
+  register: current_instance
+
+- name: Create initial dummy deployment
+  block:
+    - name: Create dummy app artifact
+      file:
+        dest: "{{ app_home }}/{{ app_artifact_name }}-0000000000.jar"
+        state: touch
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        mode: a+x
+        force: yes
+
+    - name: Link to dummy app version
+      file:
+        src: "{{ app_artifact_name }}-0000000000.jar"
+        dest: "{{ app_home }}/{{ item }}"
+        state: link
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        follow: no
+        force: yes
+      with_items: [ "blue", "green" ]
+
+    - name: Link to current instance
+      file:
+        src: "green"
+        dest: "{{ app_home }}/current-instance"
+        state: link
+        owner: "{{ app_user }}"
+        group: "{{ app_user }}"
+        follow: no
+        force: yes
+
+  when: current_instance.stat.islnk is not defined

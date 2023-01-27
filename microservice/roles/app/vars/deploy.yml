@@ -1,0 +1,4 @@
+---
+deploy_stamp: "{{ ansible_date_time['epoch'] }}"
+src_artifact: "{{ app_artifact_name }}.jar"
+dest_artifact: "{{ app_artifact_name }}-{{ deploy_stamp }}.jar"

@@ -1,0 +1,68 @@
+---
+- name: Copy app artifact
+  copy:
+    src: "{{ src_artifact }}"
+    dest: "{{ app_home }}/{{ dest_artifact }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    mode: a+x
+
+- name: Get current instance stats
+  stat:
+    path: "{{ app_home }}/current-instance"
+  register: current_instance
+
+- name: Set instance name facts
+  set_fact:
+    current_instance_name: "{{ current_instance.stat.lnk_target }}"
+    new_instance_name: "{{ 'green' if (current_instance.stat.lnk_target == 'blue') else 'blue' }}"
+
+- name: Get staging instance stats
+  stat:
+    path: "{{ app_home }}/staging-instance"
+  register: staging_instance
+
+- name: Stop and delete previous staging app version
+  block:
+    - name: Stop previous staging app instance
+      service:
+        name: "{{ app_name }}-{{ staging_instance.stat.lnk_target }}"
+        state: stopped
+    - name: Delete previous staging app version
+      file:
+        path: "{{ staging_instance.stat.lnk_source }}"
+        state: absent
+  when: staging_instance.stat.exists
+
+- name: Link to new instance
+  file:
+    src: "{{ dest_artifact }}"
+    dest: "{{ app_home }}/{{ new_instance_name }}"
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    state: link
+    follow: no
+    force: yes
+
+- name: Link to new instance
+  file:
+    src: "{{ new_instance_name }}"
+    dest: "{{ app_home }}/staging-instance"
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    state: link
+    follow: no
+    force: yes
+
+- name: Enable and start new app instance
+  service:
+    name: "{{ app_name }}-{{ new_instance_name }}"
+    enabled: yes
+    state: started
+
+- name: Wait for new app instance
+  command: "{{ app_home }}/check-{{ new_instance_name }}.sh"
+  register: check_result
+  until: check_result.stdout.find("UP") != -1
+  retries: 30
+  delay: 1

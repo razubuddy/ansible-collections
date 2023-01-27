@@ -1,0 +1,10 @@
+---
+- name: Install Certbot
+  shell: snap install --classic certbot
+  args:
+    creates: /snap/bin/certbot
+
+- name: Prepare the Certbot command
+  shell: ln -s /snap/bin/certbot /usr/bin/certbot
+  args:
+    creates: /usr/bin/certbot

@@ -1,0 +1,68 @@
+---
+- name: Get staging instance stats
+  stat:
+    path: "{{ app_home }}/staging-instance"
+  register: staging_instance
+  failed_when: not staging_instance.stat.exists
+
+- name: Get current instance stats
+  stat:
+    path: "{{ app_home }}/current-instance"
+  register: current_instance
+
+- name: Set instance name facts
+  set_fact:
+    current_instance_name: "{{ current_instance.stat.lnk_target }}"
+    new_instance_name: "{{ staging_instance.stat.lnk_target }}"
+
+- name: Assert new instance is up
+  command: "{{ app_home }}/check-{{ new_instance_name }}.sh"
+  register: check_result
+  failed_when: check_result.stdout.find("UP") == -1
+
+- name: Switch current instance to new one
+  file:
+    src: "{{ new_instance_name }}"
+    dest: "{{ app_home }}/current-instance"
+    state: link
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+    follow: no
+    force: yes
+
+- name: Enable new app upstreams
+  file:
+    src: "/etc/nginx/sites-available/{{ app_name }}_upstreams_{{ new_instance_name }}"
+    dest: "/etc/nginx/sites-enabled/{{ app_name }}_upstreams"
+    state: link
+    force: yes
+
+- name: Reload nginx
+  service:
+    name: nginx
+    state: reloaded
+
+- name: Delete staging instance
+  file:
+    path: "{{ staging_instance.stat.path }}"
+    state: absent
+
+- name: Stop current instance
+  service:
+    name: "{{ app_name }}-{{ current_instance_name }}"
+    enabled: no
+    state: stopped
+
+- name: Get previous app version stats
+  stat:
+    path: "{{ app_home }}/previous"
+  register: previous_version
+
+- name: Delete previous app version
+  file:
+    path: "{{ previous_version.stat.lnk_source }}"
+    state: absent
+  when: previous_version.stat.exists
+
+- name: Set previous app version
+  command: "cp -fP {{ app_home }}/{{ current_instance_name }} {{ app_home }}/previous"

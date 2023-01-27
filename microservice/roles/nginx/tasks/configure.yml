@@ -1,0 +1,39 @@
+---
+- name: Remove default nginx vhost config file (if configured).
+  file:
+    path: "{{ item }}/default"
+    state: absent
+  with_items: [ "{{ nginx_sites_available_path }}", "{{ nginx_sites_enabled_path }}" ]
+  when:
+  notify: restart nginx
+
+- name: Change default nginx configuration
+  template:
+    src: nginx.conf.j2
+    dest: "{{ nginx_conf_file_path }}"
+  notify: reload nginx
+
+- name: Add app server confiugration
+  template:
+    src: vhost.conf.j2
+    dest: "{{ nginx_conf_path }}/{{ nginx_app_name }}.conf"
+  notify: reload nginx
+
+- name: Add app upstreams
+  template:
+    src: upstreams.j2
+    dest: "{{ nginx_sites_available_path }}/{{ item.file }}"
+  with_items: "{{ nginx_upstream_files }}"
+  notify: reload nginx
+
+- name: Enable upstreams
+  command: "ln -s {{ nginx_sites_available_path }}/{{ nginx_app_name }}_upstreams_green {{ nginx_sites_enabled_path }}/{{ nginx_app_name }}_upstreams"
+  args:
+    creates: "{{ nginx_sites_enabled_path }}/{{ nginx_app_name }}_upstreams"
+  notify: reload nginx
+
+- name: Ensure nginx service is running as configured.
+  service:
+    name: nginx
+    state: "{{ nginx_service_state }}"
+    enabled: "{{ nginx_service_enabled }}"

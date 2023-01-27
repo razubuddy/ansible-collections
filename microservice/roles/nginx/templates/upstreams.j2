@@ -1,0 +1,5 @@
+{% for upstream in item.upstreams %}
+upstream {{ upstream.name }} {
+    server {{ upstream.server }};
+}
+{% endfor %}
