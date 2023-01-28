@@ -2,17 +2,8 @@ namespace: razubuddy
 name: microservice
 version: 0.0.1
 readme: README.md
-authors:
-- razu
-description: null
-license:
-- GPL-2.0-or-later
-license_file: ''
-tags: []
-dependencies: {}
+authors: []
+description: ""
 repository: https://github.com/razubuddy/ansible-collections/microservice
-documentation: https://github.com/razubuddy/ansible-collections/microservice
-homepage: https://github.com/razubuddy/ansible-collections/microservice
-issues: https://github.com/razubuddy/ansible-collections/microservice/issues
 build_ignore:
   - '*.tar.gz'
