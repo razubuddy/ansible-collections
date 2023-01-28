@@ -1,0 +1,29 @@
+---
+- name: Add maxmind/ppa apt repository
+  apt_repository:
+    repo: "ppa:maxmind/ppa"
+    state: present
+
+- name: Install geoipupdate
+  apt:
+    name: geoipupdate
+    state: present
+
+- name: Create GeoIP config
+  template:
+    src: GeoIP.conf.j2
+    dest: /etc/GeoIP.conf
+
+- name: Run geoipupdate to fetch databases
+  command: geoipupdate
+  changed_when: false
+
+- name: Add sync GeoIP command to cron
+  cron:
+    name: "Update GeoIP database"
+    user: root
+    minute: "1"
+    hour: "5"
+    weekday: "3"
+    job: geoipupdate
+    state: present

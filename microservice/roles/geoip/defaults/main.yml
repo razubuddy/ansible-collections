@@ -1,0 +1,4 @@
+geoip_account_id: dummy
+geoip_license_key: dummy
+geoip_edition_ids: GeoLite2-ASN GeoLite2-City GeoLite2-Country
+geoip_database_dir: /usr/share/GeoIP
