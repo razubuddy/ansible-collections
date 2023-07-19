@@ -18,6 +18,7 @@ server {
             return 204;
         }
 {% endif %}
+    }
 {% endfor %}
     access_log /var/log/nginx/{{ nginx_app_name }}_access.log;
     error_log /var/log/nginx/{{ nginx_app_name }}_error.log;
