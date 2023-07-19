@@ -86,6 +86,15 @@ nginx_upstream_files:
       - name: "{{ nginx_app_name }}-api-staging"
         server: localhost:8081
 
+nginx_internal_vhosts: [ ]
+#nginx_internal_vhosts:
+#  - port: 8080
+#    locations:
+#      - path: "/api"
+#        proxy_pass: "http://{{ nginx_app_name }}-api/api"
+#        handle_cors: false
+
+
 nginx_vhost_locations:
   - path: "/api"
     proxy_pass: "http://{{ nginx_app_name }}-api/api"
