@@ -66,3 +66,6 @@
 
 - name: Set previous app version
   command: "cp -fP {{ app_home }}/{{ current_instance_name }} {{ app_home }}/previous"
+
+- name: Set previous app version link ownership
+  command: "chown -h {{ app_user }}:{{ app_user }} {{ app_home }}/previous"
