@@ -65,5 +65,4 @@
   when: previous_version.stat.exists
 
 - name: Set previous app version
-  become_user: "{{ app_user }}"
   command: "cp -fP {{ app_home }}/{{ current_instance_name }} {{ app_home }}/previous"
