@@ -65,4 +65,4 @@
   register: check_result
   until: check_result.stdout.find("UP") != -1
   retries: 30
-  delay: 1
+  delay: 2
