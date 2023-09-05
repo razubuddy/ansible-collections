@@ -1,0 +1,16 @@
+---
+- name: Add Redis PPA repository
+  apt_repository:
+    repo: ppa:redislabs/redis
+    state: present
+
+- name: Ensure Redis is installed
+  apt:
+    name: redis
+    state: present
+
+- name: Ensure redis-server is started
+  service:
+    name: redis-server
+    enabled: yes
+    state: started
