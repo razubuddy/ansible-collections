@@ -3,6 +3,7 @@
   apt_repository:
     repo: ppa:redislabs/redis
     state: present
+  ignore_errors: true
 
 - name: Ensure Redis is installed
   apt:
