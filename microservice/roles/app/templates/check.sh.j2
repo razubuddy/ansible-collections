@@ -1,7 +1,3 @@
 #!/bin/bash -e
 
-{% if item.api_port == item.mgmt_port %}
-curl -f http://localhost:{{ item.api_port }}/api/mgmt/health
-{% else %}
 curl -f http://localhost:{{ item.mgmt_port }}/mgmt/health
-{% endif %}
