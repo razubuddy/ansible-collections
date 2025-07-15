@@ -35,10 +35,10 @@
     create: yes
   notify: restart sshd
 
-- name: Create site directory
+- name: "Create {{ nginx_site_dir }} deploy directory
   become: yes
   file:
-    path: "{{ nginx_user_dir }}/site"
+    path: "{{ nginx_user_dir }}/{{ nginx_site_dir }}"
     state: directory
     owner: "{{ nginx_user }}"
     group: "{{ nginx_user }}"
