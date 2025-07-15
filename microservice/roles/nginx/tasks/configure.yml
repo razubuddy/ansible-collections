@@ -1,46 +1,46 @@
 ---
-- name: Create site user
-  user:
-    name: "{{ nginx_site_user }}"
-    shell: /sbin/nologin
+- name: "Create .ssh directory for {{ nginx_user }}"
+  file:
+    path: "{{ nginx_user_dir }}/.ssh"
+    state: directory
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_user }}"
+    mode: 0700
 
-- name: Add public ssh key for site user
+- name: "Add public ssh key for {{ nginx_user }}"
   authorized_key:
-    user: "{{ nginx_site_user }}"
+    user: "{{ nginx_user }}"
     state: present
-    key: "{{ nginx_site_user_key }}"
+    key: "{{ nginx_user_key }}"
 
-- name: Allow site user to deploy only
+- name: Ensure SFTP subsystem is set to internal-sftp
+  lineinfile:
+    path: /etc/ssh/sshd_config
+    regexp: '^Subsystem\s+sftp'
+    line: "Subsystem\tsftp\tinternal-sftp"
+
+- name: "Restrict {{ nginx_user }} to SFTP only"
   blockinfile:
     path: /etc/ssh/sshd_config
     block: |
-      Match User {{ nginx_site_user }}
+      Match User {{ nginx_user }}
           ForceCommand internal-sftp
           PasswordAuthentication no
-          ChrootDirectory /var/www/site
+          ChrootDirectory {{ nginx_user_dir }}
           PermitTunnel no
           AllowAgentForwarding no
           AllowTcpForwarding no
           X11Forwarding no
-    marker: "# {mark} ANSIBLE MANAGED BLOCK FOR '{{ nginx_site_user }}' USER"
+    marker: "# {mark} ANSIBLE MANAGED BLOCK FOR '{{ nginx_user }}' USER"
     create: yes
   notify: restart sshd
-
-- name: Change default folder permissions
-  become: yes
-  file:
-    path: /var/www
-    state: directory
-    owner: "{{ nginx_user }}"
-    group: "{{ nginx_user }}"
-  notify: reload nginx
 
 - name: Create site directory
   become: yes
   file:
-    path: /var/www/site
+    path: "{{ nginx_user_dir }}/site"
     state: directory
-    owner: "{{ nginx_site_user }}"
+    owner: "{{ nginx_user }}"
     group: "{{ nginx_user }}"
     mode: 0755
   notify: reload nginx

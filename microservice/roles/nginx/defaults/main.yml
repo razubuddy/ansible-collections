@@ -64,9 +64,8 @@ nginx_log_format: |-
 # name of the vhost
 nginx_app_name: app
 
-# user for site deployment
-nginx_site_user: site
-nginx_site_user_key: "change_me"
+nginx_user_dir: /var/www
+nginx_user_key: "change_me"
 
 # domain
 #nginx_server_name: example.com
