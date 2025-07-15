@@ -1,4 +1,28 @@
 ---
+- name: Create site user
+  user:
+    name: "{{ nginx_site_user }}"
+    shell: /bin/bash
+
+- name: Change default folder permissions
+  become: yes
+  file:
+    path: /var/www
+    state: directory
+    owner: "{{ nginx_user }}"
+    group: "{{ nginx_user }}"
+  notify: reload nginx
+
+- name: Create site directory
+  become: yes
+  file:
+    path: /var/www/site
+    state: directory
+    owner: "{{ nginx_site_user }}"
+    group: "{{ nginx_user }}"
+    mode: 0775
+  notify: reload nginx
+
 - name: Remove default nginx vhost config file (if configured).
   file:
     path: "{{ item }}/default"

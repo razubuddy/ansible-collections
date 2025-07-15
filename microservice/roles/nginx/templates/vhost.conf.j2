@@ -62,6 +62,12 @@ server {
 
 {% endfor %}
 
+    location / {
+        root /var/www/site;
+        index index.html;
+        try_files $uri $uri/ =404;
+    }
+
     access_log /var/log/nginx/{{ nginx_app_name }}_access.log;
     error_log /var/log/nginx/{{ nginx_app_name }}_error.log;
 }
