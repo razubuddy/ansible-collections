@@ -35,7 +35,7 @@
     create: yes
   notify: restart sshd
 
-- name: "Create {{ nginx_site_dir }} deploy directory
+- name: "Create {{ nginx_site_dir }} deploy directory"
   become: yes
   file:
     path: "{{ nginx_user_dir }}/{{ nginx_site_dir }}"
