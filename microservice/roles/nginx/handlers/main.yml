@@ -9,7 +9,16 @@
     name: nginx
     state: reloaded
 
-- name: restart sshd
+- name: Execute restart sshd
   systemd:
     name: sshd
     state: restarted
+  listen: "restart sshd"
+  async: 5
+  poll: 0
+
+- name: Wait for sshd to start
+  wait_for_connection:
+    delay: 5
+    timeout: 60
+  listen: "restart sshd"
