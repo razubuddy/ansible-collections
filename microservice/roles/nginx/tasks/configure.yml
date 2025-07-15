@@ -1,17 +1,8 @@
 ---
-- name: Create no-ssh shell script
-  copy:
-    dest: /bin/no-ssh.sh
-    content: |
-      #!/bin/sh
-      echo "SSH access is forbidden"
-      exit 128
-    mode: 0755
-
 - name: Create site user
   user:
     name: "{{ nginx_site_user }}"
-    shell: /bin/no-ssh.sh
+    shell: /sbin/nologin
 
 - name: Add public ssh key for site user
   authorized_key:
