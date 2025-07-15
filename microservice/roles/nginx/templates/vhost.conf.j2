@@ -63,7 +63,7 @@ server {
 {% endfor %}
 
     location / {
-        root /var/www/site;
+        root {{ nginx_user_dir }}/{{ nginx_site_dir }};
         index index.html;
         try_files $uri $uri/ =404;
     }
