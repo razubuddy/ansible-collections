@@ -10,6 +10,21 @@
     state: present
     key: "{{ nginx_site_user_key }}"
 
+- name: Allow site user to deploy only
+  blockinfile:
+    path: /etc/ssh/sshd_config
+    block: |
+      Match User {{ nginx_site_user }}
+          ForceCommand internal-sftp
+          PasswordAuthentication no
+          ChrootDirectory /var/www/site
+          PermitTunnel no
+          AllowAgentForwarding no
+          AllowTcpForwarding no
+          X11Forwarding no
+    marker: "# {mark} ANSIBLE MANAGED BLOCK FOR '{{ nginx_site_user }}' USER"
+    create: yes
+
 - name: Change default folder permissions
   become: yes
   file:
@@ -26,7 +41,7 @@
     state: directory
     owner: "{{ nginx_site_user }}"
     group: "{{ nginx_user }}"
-    mode: 0775
+    mode: 0755
   notify: reload nginx
 
 - name: Remove default nginx vhost config file (if configured).
