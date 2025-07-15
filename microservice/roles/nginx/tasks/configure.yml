@@ -24,6 +24,7 @@
           X11Forwarding no
     marker: "# {mark} ANSIBLE MANAGED BLOCK FOR '{{ nginx_site_user }}' USER"
     create: yes
+  notify: restart sshd
 
 - name: Change default folder permissions
   become: yes
