@@ -18,6 +18,7 @@
     path: /etc/ssh/sshd_config
     regexp: '^Subsystem\s+sftp'
     line: "Subsystem\tsftp\tinternal-sftp"
+  notify: restart sshd
 
 - name: "Restrict {{ nginx_user }} to SFTP only"
   blockinfile:
