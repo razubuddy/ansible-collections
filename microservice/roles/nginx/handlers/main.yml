@@ -11,7 +11,7 @@
 
 - name: Execute restart sshd
   systemd:
-    name: sshd
+    name: ssh
     state: restarted
   listen: "restart sshd"
   async: 5

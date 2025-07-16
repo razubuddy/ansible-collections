@@ -67,6 +67,7 @@ nginx_app_name: app
 nginx_user_dir: /var/www
 nginx_user_key: change_me
 nginx_site_dir: site
+nginx_chroot_dir: /var/www/html
 
 # domain
 #nginx_server_name: example.com

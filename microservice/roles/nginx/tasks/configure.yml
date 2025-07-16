@@ -26,7 +26,7 @@
       Match User {{ nginx_user }}
           ForceCommand internal-sftp
           PasswordAuthentication no
-          ChrootDirectory {{ nginx_user_dir }}
+          ChrootDirectory {{ nginx_chroot_dir }}
           PermitTunnel no
           AllowAgentForwarding no
           AllowTcpForwarding no
@@ -35,10 +35,18 @@
     create: yes
   notify: restart sshd
 
-- name: "Create {{ nginx_site_dir }} deploy directory"
-  become: yes
+- name: "Ensure chroot dir exists and have root permissions"
   file:
-    path: "{{ nginx_user_dir }}/{{ nginx_site_dir }}"
+    path: "{{ nginx_chroot_dir }}"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  notify: reload nginx
+
+- name: "Create {{ nginx_site_dir }} deploy directory"
+  file:
+    path: "{{ nginx_chroot_dir }}/{{ nginx_site_dir }}"
     state: directory
     owner: "{{ nginx_user }}"
     group: "{{ nginx_user }}"
