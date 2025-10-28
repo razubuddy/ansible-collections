@@ -13,4 +13,6 @@ app_instances:
     api_port: 8082
     mgmt_port: 8082
 
-app_service_envs: ''
+app_active_profiles: default
+app_common_env: ''
+app_instance_env: ''

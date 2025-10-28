@@ -6,12 +6,12 @@ After=network-online.target
 User={{ app_user }}
 Group={{ app_user }}
 WorkingDirectory={{ app_home }}
-ExecStart={{ app_home }}/{{ item.name }}
+EnvironmentFile={{ app_home }}/{{ app_name }}.env
+EnvironmentFile={{ app_home }}/{{ item.name }}.env
+ExecStart=java $COMMON_JAVA_OPTS $INSTANCE_JAVA_OPTS -jar {{ app_home }}/{{ item.name }}
 SuccessExitStatus=143
 Restart=always
 RestartSec=10
-
-{{ app_service_envs|indent(0, False) }}
 
 [Install]
 WantedBy=multi-user.target
