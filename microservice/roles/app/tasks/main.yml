@@ -12,10 +12,18 @@
     group: "{{ app_user }}"
     mode: 0755
 
-- name: Create config file
+- name: Create common env file
   template:
-    src: app.conf.j2
-    dest: "{{ app_home }}/{{ item.name }}.conf"
+    src: app.env.j2
+    dest: "{{ app_home }}/{{ app_name }}.env"
+    owner: "{{ app_user }}"
+    group: "{{ app_user }}"
+  with_items: "{{ app_instances }}"
+
+- name: Create instance env file
+  template:
+    src: instance.env.j2
+    dest: "{{ app_home }}/{{ item.name }}.env"
     owner: "{{ app_user }}"
     group: "{{ app_user }}"
   with_items: "{{ app_instances }}"
@@ -31,7 +39,7 @@
 
 - name: Create service
   template:
-    src: app.service.j2
+    src: instance.service.j2
     dest: /etc/systemd/system/{{ app_name }}-{{ item.name }}.service
   with_items: "{{ app_instances }}"
   notify: reload services
