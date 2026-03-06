@@ -18,7 +18,6 @@
     dest: "{{ app_home }}/{{ app_name }}.env"
     owner: "{{ app_user }}"
     group: "{{ app_user }}"
-  with_items: "{{ app_instances }}"
 
 - name: Create instance env file
   template:

@@ -103,10 +103,8 @@ nginx_internal_vhosts: [ ]
 nginx_vhost_locations:
   - path: "/api"
     proxy_pass: "http://{{ nginx_app_name }}-api/api"
-    handle_cors: true
   - path: "/api-staging"
     proxy_pass: "http://{{ nginx_app_name }}-api-staging/api"
-    handle_cors: false
 
 nginx_vhost_extra_locations: [ ]
 
