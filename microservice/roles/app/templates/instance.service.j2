@@ -1,6 +1,6 @@
 [Unit]
 Description={{ app_name }} application
-After=network-online.target
+After=network-online.target{{ ' ' + app_service_after | join(' ') if app_service_after else '' }}
 
 [Service]
 User={{ app_user }}
