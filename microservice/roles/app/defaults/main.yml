@@ -14,7 +14,7 @@ app_instances:
     mgmt_port: 8082
 
 app_service_after: []
-
+app_extra_java_opts: ''
 app_active_profiles: default
 app_common_env: ''
 app_instance_env: ''
